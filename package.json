@@ -1,0 +1,19 @@
+{
+  "name": "mcp-color-convert",
+  "version": "0.0.4",
+  "description": "Color converter MCP using colorizr",
+  "bin": {
+    "mcp-color-convert": "index.js"
+  },
+  "license": "MIT",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.20.1",
+    "colorizr": "^3.0.8",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {}
+}
