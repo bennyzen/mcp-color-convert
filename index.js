@@ -24,6 +24,11 @@ import {
 } from "colorizr";
 import { z } from "zod";
 
+// Optional: Configuration schema for session
+export const configSchema = z.object({
+  debug: z.boolean().default(false).describe("Enable debug logging"),
+});
+
 // NOTE: MCP server tools require Zod schemas for inputSchema, not JSON Schema format.
 // The registerTool method expects: (name, {title, description, inputSchema}, handler)
 // where inputSchema uses Zod objects like: { field: z.string().describe("description") }
@@ -442,6 +447,11 @@ server.registerTool(
 );
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+
+// Smithery requires default export function
+export default function createServer({ config }) {
+  return server;
+}
 
 const transport = new StdioServerTransport();
 await server.connect(transport);
