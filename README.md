@@ -16,32 +16,90 @@ A comprehensive Model Context Protocol (MCP) server for color conversion, manipu
 Once configured, your AI coding agent will be able to discover and use these color conversion tools seamlessly within your development workflow.
 
 
-## Installation
+## Installation & Configuration
 
-### Global Installation
-```bash
-npm install -g mcp-color-convert
+### MCP Client Configuration
+
+This is the recommended way to use the MCP server. Add it to your MCP client configuration:
+
+#### Claude Desktop or Gemini CLI
+Add this server to your agent config file:
+
+```json
+{
+  "mcpServers": {
+    "color-converter": {
+      "command": "npx",
+      "args": [
+        "-y",
+        "mcp-color-convert@latest"
+      ]
+    }
+  }
+}
 ```
 
-### Use with npx (Recommended)
-```bash
-npx mcp-color-convert
+#### Custom MCP Client Configuration
+For any MCP client supporting stdio transport:
+
+```json
+{
+  "servers": [
+    {
+      "name": "color-converter",
+      "description": "AI-powered color conversion, manipulation, analysis, and accessibility tools for design systems",
+      "transport": {
+        "type": "stdio",
+        "command": "npx",
+        "args": ["-y", "mcp-color-convert@latest"]
+      }
+    }
+  ]
+}
 ```
+
+The `npx -y mcp-color-convert@latest` command ensures:
+- Automatic installation if not present
+- Always uses the latest version
+- No global dependencies required
+- Works across different environments
+
+Consult your MCP client's documentation for specific configuration details.
 
 ## Supported Color Formats
 
 This MCP server supports conversion between the following color formats:
 
+**Input Formats (any accepted):**
 - **HEX**: `#FF0000`, `#ff0000`
 - **RGB**: `rgb(255, 0, 0)`, `rgb(255,0,0)`
+- **RGBA**: `rgba(255, 0, 0, 0.5)`, `rgba(255,0,0,0.5)` (with alpha/transparency)
 - **HSL**: `hsl(0, 100%, 50%)`, `hsl(0,100%,50%)`
+- **HSLA**: `hsla(0, 100%, 50%, 0.5)`, `hsla(0,100%,50%,0.5)` (with alpha/transparency)
 - **OkLCH**: `oklch(63.269% 0.25404 19.90218)` (modern perceptual color space)
+- **OkLCH with alpha**: `oklch(63.269% 0.25404 19.90218 / 0.5)` (alpha uses slash syntax)
 - **OkLab**: `oklab(0.62796 0.22486 0.12585)` (perceptual color space)
+- **OkLab with alpha**: `oklab(0.62796 0.22486 0.12585 / 0.5)` (alpha uses slash syntax)
+- **Named Colors**: `red`, `blue`, `green`, `purple`, etc.
+
+**Alpha/Transparency Support:**
+All major color formats support alpha values (0-1 scale):
+- RGBA/HSLA use comma syntax: `rgba(255, 0, 0, 0.5)`
+- OkLCH/OkLab use slash syntax: `oklch(63.269% 0.25404 19.90218 / 0.5)`
+- Alpha is preserved when converting between alpha-supporting formats
+- Alpha is removed when converting to formats that don't support it (like hex)
+
+**Output Formats (for convert tool):**
+- `hex` - Returns: `#FF0000`
+- `rgb` - Returns: `rgb(255 0 68)`
+- `hsl` - Returns: `hsl(344 100% 50%)`
+- `oklch` - Returns: `oklch(63.269% 0.25404 19.90218)`
+- `oklab` - Returns: `oklab(0.62796 0.22486 0.12585)`
 
 ## Available Tools
 
 ### Color Conversion
-- **`convert`** - Universal converter between any supported formats (hex, rgb, hsl, oklch, oklab)
+- **`convert`** - Universal converter between any supported formats. Accepts any valid color input (hex, rgb, rgba, hsl, hsla, oklch, oklab, or named colors like 'red', 'blue') including alpha/transparency values and converts to hex, rgb, hsl, oklch, or oklab format. Alpha is preserved when converting between alpha-supporting formats, removed when converting to non-alpha formats. Uses colorizr's built-in convert function for optimal format handling.
 
 ### Color Manipulation
 - **`lighten`** - Increase color lightness by percentage amount
@@ -54,7 +112,7 @@ This MCP server supports conversion between the following color formats:
 ### Color Analysis
 - **`luminance`** - Get WCAG relative brightness (0-1 scale)
 - **`chroma`** - Get color intensity/purity (0-1 scale)
-- **`opacity`** - Extract alpha/opacity value (0-1 scale)
+- **`opacity`** - Extract alpha/opacity value (0-1 scale) from any color format that supports transparency
 - **`name`** - Get common color name or hex if unnamed
 
 ### Color Generation
@@ -73,7 +131,7 @@ This MCP server supports conversion between the following color formats:
 
 ### Example Usage
 
-Convert HEX to OkLCH:
+Convert any color format to another:
 ```json
 {
   "tool": "convert",
@@ -83,6 +141,42 @@ Convert HEX to OkLCH:
   }
 }
 // Returns: "oklch(63.269% 0.25404 19.90218)"
+```
+
+Convert named color to HSL:
+```json
+{
+  "tool": "convert",
+  "arguments": {
+    "color": "blue",
+    "format": "hsl"
+  }
+}
+// Returns: "hsl(240 100% 50%)"
+```
+
+Convert RGBA to hex (alpha removed):
+```json
+{
+  "tool": "convert",
+  "arguments": {
+    "color": "rgba(255, 0, 0, 0.5)",
+    "format": "hex"
+  }
+}
+// Returns: "#ff0000"
+```
+
+Convert RGBA to OkLCH (alpha preserved):
+```json
+{
+  "tool": "convert",
+  "arguments": {
+    "color": "rgba(255, 0, 0, 0.5)",
+    "format": "oklch"
+  }
+}
+// Returns: "oklch(62.796% 0.25768 29.23494 / 0.5)"
 ```
 
 Lighten a color for hover state:
@@ -117,48 +211,67 @@ Generate design system swatch:
     "color": "#3B82F6"
   }
 }
-// Returns: {"50": "#eff6ff", "100": "#dbeafe", "200": "#bfdbfe", ... "950": "#172554"}
+// Returns: {"50": "#eff6ff", "100": "#dbeafe", "200": "#bfdbfe", ..., "950": "#172554"}
 ```
 
-## MCP Client Configuration
 
-### Claude Desktop or Gemini CLI Configuration example
-Add this server to your Claude Desktop `claude_desktop_config.json`:
+## Development
 
-```json
-{
-  "mcpServers": {
-    "color-converter": {
-      "command": "npx",
-      "args": [
-        "-y",
-        "mcp-color-convert@latest"
-      ]
-    }
-  }
-}
-```
+### Setting Up Development Environment
 
-### Custom MCP Client Configuration
-For any MCP client supporting stdio transport:
+1. **Clone and install dependencies:**
+   ```bash
+   git clone https://github.com/bennyzen/mcp-color-convert.git
+   cd mcp-color-convert
+   npm install
+   ```
 
-```json
-{
-  "servers": [
+2. **Test the MCP server locally:**
+   ```bash
+   # Test the server dry BEFORE trying to use it with an MCP client to catch obvious errors
+   npx -y .
+   ```
+
+3. **Using with your agent (MCP client) locally:**
+   - Update your MCP client configuration to point to the local installation (e.g., `npx -y /path/to/mcp-color-convert`)
+   ```json
     {
-      "name": "color-converter",
-      "description": "AI-powered color conversion, manipulation, analysis, and accessibility tools for design systems",
-      "transport": {
-        "type": "stdio",
-        "command": "npx",
-        "args": ["-y", "mcp-color-convert@latest"]
+      "mcpServers": {
+        "color-converter": {
+          "command": "npx",
+          "args": [
+            "-y",
+            "/path/to/mcp-color-convert"
+          ]
+        }
       }
     }
-  ]
-}
-```
+   ```
+   Important: Restart your MCP client after making configuration changes!
 
-Consult your MCP client's documentation for specific configuration details.
+
+4. **Testing:**
+    Use your MCP client to call the server and test various tools. You can enter phrases like:
+    - "List all your color conversion tools"
+    - "Convert #FF5733 to HSL"
+    - "Lighten rgb(100, 150, 200) by 15%"
+    - "Create a palette of red in oklch"
+
+
+### Adding New Tools
+
+To add new color tools:
+
+1. Write the tool function following existing examples
+2. Register the tool using `server.registerTool()`
+3. Follow the existing pattern for input validation with Zod schemas
+4. Handle errors with `McpError` for consistent error reporting
+
+### Library Dependencies
+
+- `@modelcontextprotocol/sdk` - MCP server framework
+- `colorizr` - Color manipulation library (verify exports before use)
+- `zod` - Input validation schemas
 
 ## License
 MIT License. See `LICENSE` file for details.
