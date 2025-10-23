@@ -453,5 +453,8 @@ export default function createServer({ config }) {
   return server;
 }
 
-const transport = new StdioServerTransport();
-await server.connect(transport);
+// Auto-connect if running directly (not when imported by Smithery)
+if (process.argv[1] && process.argv[1].endsWith('/index.js')) {
+  const transport = new StdioServerTransport();
+  server.connect(transport);
+}

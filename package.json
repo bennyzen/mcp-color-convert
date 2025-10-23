@@ -2,12 +2,25 @@
   "name": "mcp-color-convert",
   "version": "0.0.8",
   "description": "Comprehensive color conversion, manipulation, analysis, and accessibility MCP server",
-  "keywords": ["color", "converter", "mcp", "model-context-protocol", "colorizr", "hex", "rgb", "hsl", "oklch", "oklab", "color-space"],
+  "keywords": [
+    "color",
+    "converter",
+    "mcp",
+    "model-context-protocol",
+    "colorizr",
+    "hex",
+    "rgb",
+    "hsl",
+    "oklch",
+    "oklab",
+    "color-space"
+  ],
   "bin": {
     "mcp-color-convert": "index.js"
   },
   "license": "MIT",
   "type": "module",
+  "module": "./index.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/bennyzen/mcp-color-convert.git"
@@ -23,5 +36,7 @@
     "colorizr": "^3.0.8",
     "zod": "^3.23.8"
   },
-  "devDependencies": {}
+  "devDependencies": {
+    "@smithery/cli": "^1.6.3"
+  }
 }
