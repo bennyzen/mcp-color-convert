@@ -2,6 +2,7 @@
   "name": "mcp-color-convert",
   "version": "0.0.4",
   "description": "Color converter MCP using colorizr",
+  "keywords": ["color", "converter", "mcp", "model-context-protocol", "colorizr", "hex", "rgb", "hsl", "oklch", "oklab", "color-space"],
   "bin": {
     "mcp-color-convert": "index.js"
   },
