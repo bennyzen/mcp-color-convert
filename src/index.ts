@@ -454,7 +454,13 @@ export default function createServer({ config }) {
 }
 
 // Auto-connect if running directly (not when imported by Smithery)
-if (process.argv[1] && process.argv[1].endsWith('/index.js')) {
+if (process.argv[1] && process.argv[1].endsWith('/index.ts')) {
+  const transport = new StdioServerTransport();
+  server.connect(transport);
+}
+
+// Always start the server if not being imported by Smithery
+if (!process.env.SMITHERY) {
   const transport = new StdioServerTransport();
   server.connect(transport);
 }

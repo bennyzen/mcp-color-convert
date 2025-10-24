@@ -1,6 +1,6 @@
 {
   "name": "mcp-color-convert",
-  "version": "0.0.8",
+  "version": "0.0.9",
   "description": "Comprehensive color conversion, manipulation, analysis, and accessibility MCP server",
   "keywords": [
     "color",
@@ -16,11 +16,12 @@
     "color-space"
   ],
   "bin": {
-    "mcp-color-convert": "index.js"
+    "mcp-color-convert": "src/index.ts"
   },
   "license": "MIT",
   "type": "module",
-  "module": "./index.js",
+  "module": "src/index.ts",
+
   "repository": {
     "type": "git",
     "url": "https://github.com/bennyzen/mcp-color-convert.git"
@@ -29,7 +30,9 @@
     "url": "https://github.com/bennyzen/mcp-color-convert/issues"
   },
   "scripts": {
-    "start": "node index.js"
+    "start": "node src/index.ts",
+    "build": "npx smithery build",
+    "dev": "npx smithery dev"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.20.1",
