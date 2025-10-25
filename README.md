@@ -2,6 +2,8 @@
 
 A comprehensive Model Context Protocol (MCP) server for color conversion, manipulation, analysis, and accessibility, designed for AI coding agents and assistants. This server provides a complete color toolkit for design systems, web development, and accessibility compliance using the `colorizr` library.
 
+[![smithery badge](https://smithery.ai/badge/@bennyzen/mcp-color-convert)](https://smithery.ai/server/@bennyzen/mcp-color-convert)
+
 ## Use Cases for AI Agents
 
 - **UI/UX Design**: Convert design system colors between formats for different platforms

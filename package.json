@@ -1,6 +1,6 @@
 {
   "name": "mcp-color-convert",
-  "version": "0.0.9",
+  "version": "0.1.0",
   "description": "Comprehensive color conversion, manipulation, analysis, and accessibility MCP server",
   "keywords": [
     "color",
@@ -16,11 +16,11 @@
     "color-space"
   ],
   "bin": {
-    "mcp-color-convert": "src/index.ts"
+    "mcp-color-convert": "dist/index.js"
   },
   "license": "MIT",
   "type": "module",
-  "module": "src/index.ts",
+  "module": "dist/index.js",
 
   "repository": {
     "type": "git",
