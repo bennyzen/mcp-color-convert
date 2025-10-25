@@ -447,30 +447,15 @@ server.registerTool(
 );
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { fileURLToPath } from "url";
 
 // Smithery requires default export function
 export default function createServer({ config }: { config?: any }) {
   return server.server;
 }
 
-// Detect if running as main module (works for both .ts and .js)
-const isMainModule = () => {
-  // For ESM modules
-  if (import.meta.url) {
-    const modulePath = fileURLToPath(import.meta.url);
-    // Check if this is the main executed file
-    return process.argv[1] && (
-      process.argv[1] === modulePath ||
-      process.argv[1].endsWith('/index.ts') ||
-      process.argv[1].endsWith('/index.js')
-    );
-  }
-  return false;
-};
-
-// Auto-connect if running directly (not when imported by Smithery)
-if (isMainModule() && !process.env.SMITHERY) {
+// Auto-connect when run as a standalone server (not when imported by Smithery)
+// This handles: node dist/index.js, npx mcp-color-convert, and MCP clients
+if (!process.env.SMITHERY) {
   const transport = new StdioServerTransport();
   server.connect(transport);
 }
