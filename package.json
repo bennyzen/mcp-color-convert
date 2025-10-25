@@ -1,6 +1,6 @@
 {
   "name": "mcp-color-convert",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Comprehensive color conversion, manipulation, analysis, and accessibility MCP server",
   "keywords": [
     "color",
@@ -18,21 +18,38 @@
   "bin": {
     "mcp-color-convert": "dist/index.js"
   },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "license": "MIT",
   "type": "module",
-  "module": "dist/index.js",
-
+  "module": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "README.md",
+    "LICENSE"
+  ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/bennyzen/mcp-color-convert.git"
+    "url": "git+https://github.com/bennyzen/mcp-color-convert.git"
   },
   "bugs": {
     "url": "https://github.com/bennyzen/mcp-color-convert/issues"
   },
   "scripts": {
-    "start": "node src/index.ts",
-    "build": "npx smithery build",
-    "dev": "npx smithery dev"
+    "start": "node dist/index.js",
+    "build": "tsc && npx smithery build",
+    "build:tsc": "tsc",
+    "build:smithery": "npx smithery build",
+    "dev": "npx smithery dev",
+    "prepublishOnly": "npm run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.20.1",
@@ -40,6 +57,7 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@smithery/cli": "^1.6.3"
+    "@smithery/cli": "^1.6.3",
+    "typescript": "^5.6.3"
   }
 }

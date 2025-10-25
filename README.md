@@ -217,6 +217,47 @@ Generate design system swatch:
 ```
 
 
+## Publishing & Deployment
+
+### NPM Publishing
+
+This package is published to NPM and can be used with `npx`:
+
+```bash
+npx -y mcp-color-convert@latest
+```
+
+**To publish a new version:**
+
+1. Update version in `package.json`
+2. Commit all changes
+3. Run `npm publish` (this will automatically build before publishing)
+
+**Build process:**
+- TypeScript compiles to `dist/` directory
+- Smithery builds for deployment to `.smithery/` directory
+- Only `dist/`, `src/`, `README.md`, and `LICENSE` are included in the NPM package
+
+### Smithery Deployment
+
+This server is compatible with [Smithery](https://smithery.ai) for both local and remote deployment:
+
+**Local Deployment (current configuration):**
+- Server runs on the user's machine
+- Users install via NPM or NPX
+- Configuration in `smithery.yaml`: `target: local`
+
+**Remote Deployment:**
+- Server runs on Smithery's infrastructure
+- Change `smithery.yaml`: `target: remote`
+- Connect your GitHub repository to Smithery
+- Deploy from the Deployments tab on your server page
+
+**Smithery features:**
+- Automatic discovery by MCP clients
+- Session configuration forms (via `configSchema` export)
+- One-click installation for users
+
 ## Development
 
 ### Setting Up Development Environment
@@ -274,6 +315,34 @@ To add new color tools:
 - `@modelcontextprotocol/sdk` - MCP server framework
 - `colorizr` - Color manipulation library (verify exports before use)
 - `zod` - Input validation schemas
+
+## Troubleshooting
+
+### Server won't start
+- Ensure Node.js 18+ is installed: `node --version`
+- Try clearing npm cache: `npm cache clean --force`
+- Reinstall dependencies: `rm -rf node_modules package-lock.json && npm install`
+
+### NPX execution issues
+- Use the `-y` flag to auto-install: `npx -y mcp-color-convert@latest`
+- Check NPM registry access: `npm ping`
+- Verify package exists: `npm view mcp-color-convert`
+
+### Build failures
+- Ensure TypeScript is installed: `npm install`
+- Clean build: `rm -rf dist/ .smithery/ && npm run build`
+- Check for TypeScript errors: `npm run build:tsc`
+
+### MCP Client connection issues
+- Restart your MCP client after configuration changes
+- Verify the server starts: `node dist/index.js` (should hang waiting for input - this is correct)
+- Check logs in your MCP client for connection errors
+- Ensure the path in your client config is correct
+
+### Color conversion errors
+- Verify color format matches supported types (hex, rgb, hsl, oklch, oklab)
+- Check alpha values use correct syntax (comma for rgba/hsla, slash for oklch/oklab)
+- Named colors must be valid CSS color names
 
 ## License
 MIT License. See `LICENSE` file for details.

@@ -1,0 +1,30 @@
+# Development files
+*.ts
+!*.d.ts
+tsconfig.json
+
+# Git
+.git
+.gitignore
+
+# Build artifacts
+.smithery/
+node_modules/
+
+# Development configs
+.vscode/
+.idea/
+
+# Tests
+test/
+tests/
+__tests__/
+*.test.*
+*.spec.*
+
+# Misc
+*.log
+*.swp
+*.swo
+*~
+.DS_Store

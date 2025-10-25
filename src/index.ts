@@ -52,12 +52,12 @@ server.registerTool(
   async (args) => {
     const { color, format } = args;
     try {
-      const convertedColor = convert(color, format);
+      const convertedColor = convert(color, format as any);
       return {
         content: [{ type: "text", text: JSON.stringify({ color: convertedColor }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color or format: ${error.message}`);
+      throw new McpError(-32000, `Invalid color or format: ${(error as Error).message}`);
     }
   }
 );
@@ -82,7 +82,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ lightened: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color or amount: ${error.message}`);
+      throw new McpError(-32000, `Invalid color or amount: ${(error as Error).message}`);
     }
   }
 );
@@ -104,7 +104,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ darkened: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color or amount: ${error.message}`);
+      throw new McpError(-32000, `Invalid color or amount: ${(error as Error).message}`);
     }
   }
 );
@@ -126,7 +126,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ saturated: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color or amount: ${error.message}`);
+      throw new McpError(-32000, `Invalid color or amount: ${(error as Error).message}`);
     }
   }
 );
@@ -148,7 +148,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ desaturated: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color or amount: ${error.message}`);
+      throw new McpError(-32000, `Invalid color or amount: ${(error as Error).message}`);
     }
   }
 );
@@ -172,7 +172,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ rotated: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color or degrees: ${error.message}`);
+      throw new McpError(-32000, `Invalid color or degrees: ${(error as Error).message}`);
     }
   }
 );
@@ -194,7 +194,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ luminance: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color: ${error.message}`);
+      throw new McpError(-32000, `Invalid color: ${(error as Error).message}`);
     }
   }
 );
@@ -215,7 +215,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ chroma: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color: ${error.message}`);
+      throw new McpError(-32000, `Invalid color: ${(error as Error).message}`);
     }
   }
 );
@@ -236,7 +236,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ opacity: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color: ${error.message}`);
+      throw new McpError(-32000, `Invalid color: ${(error as Error).message}`);
     }
   }
 );
@@ -257,7 +257,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ name: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color: ${error.message}`);
+      throw new McpError(-32000, `Invalid color: ${(error as Error).message}`);
     }
   }
 );
@@ -275,13 +275,13 @@ server.registerTool(
   },
   async ({ color, type }) => {
     try {
-      const options = type ? { type } : {};
+      const options = type ? { type } as any : {};
       const result = palette(color, options);
       return {
         content: [{ type: "text", text: JSON.stringify({ palette: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color or type: ${error.message}`);
+      throw new McpError(-32000, `Invalid color or type: ${(error as Error).message}`);
     }
   }
 );
@@ -298,12 +298,12 @@ server.registerTool(
   },
   async ({ color, type }) => {
     try {
-      const result = scheme(color, type);
+      const result = scheme(color, type as any);
       return {
         content: [{ type: "text", text: JSON.stringify({ scheme: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color or scheme type: ${error.message}`);
+      throw new McpError(-32000, `Invalid color or scheme type: ${(error as Error).message}`);
     }
   }
 );
@@ -322,7 +322,7 @@ server.registerTool(
   },
   async ({ color, lightnessFactor, maxLightness, minLightness }) => {
     try {
-      const options = {};
+      const options: any = {};
       if (lightnessFactor !== undefined) options.lightnessFactor = lightnessFactor;
       if (maxLightness !== undefined) options.maxLightness = maxLightness;
       if (minLightness !== undefined) options.minLightness = minLightness;
@@ -332,7 +332,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ swatch: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid color or options: ${error.message}`);
+      throw new McpError(-32000, `Invalid color or options: ${(error as Error).message}`);
     }
   }
 );
@@ -348,12 +348,12 @@ server.registerTool(
   },
   async ({ format }) => {
     try {
-      const result = random(format || 'hex');
+      const result = random((format || 'hex') as any);
       return {
         content: [{ type: "text", text: JSON.stringify({ random: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid format: ${error.message}`);
+      throw new McpError(-32000, `Invalid format: ${(error as Error).message}`);
     }
   }
 );
@@ -376,7 +376,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ contrast: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid colors: ${error.message}`);
+      throw new McpError(-32000, `Invalid colors: ${(error as Error).message}`);
     }
   }
 );
@@ -398,7 +398,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ analysis: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid colors: ${error.message}`);
+      throw new McpError(-32000, `Invalid colors: ${(error as Error).message}`);
     }
   }
 );
@@ -419,7 +419,7 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ textColor: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Invalid background color: ${error.message}`);
+      throw new McpError(-32000, `Invalid background color: ${(error as Error).message}`);
     }
   }
 );
@@ -441,26 +441,36 @@ server.registerTool(
         content: [{ type: "text", text: JSON.stringify({ valid: result }) }],
       };
     } catch (error) {
-      throw new McpError(-32000, `Validation error: ${error.message}`);
+      throw new McpError(-32000, `Validation error: ${(error as Error).message}`);
     }
   }
 );
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { fileURLToPath } from "url";
 
 // Smithery requires default export function
-export default function createServer({ config }) {
-  return server;
+export default function createServer({ config }: { config?: any }) {
+  return server.server;
 }
+
+// Detect if running as main module (works for both .ts and .js)
+const isMainModule = () => {
+  // For ESM modules
+  if (import.meta.url) {
+    const modulePath = fileURLToPath(import.meta.url);
+    // Check if this is the main executed file
+    return process.argv[1] && (
+      process.argv[1] === modulePath ||
+      process.argv[1].endsWith('/index.ts') ||
+      process.argv[1].endsWith('/index.js')
+    );
+  }
+  return false;
+};
 
 // Auto-connect if running directly (not when imported by Smithery)
-if (process.argv[1] && process.argv[1].endsWith('/index.ts')) {
-  const transport = new StdioServerTransport();
-  server.connect(transport);
-}
-
-// Always start the server if not being imported by Smithery
-if (!process.env.SMITHERY) {
+if (isMainModule() && !process.env.SMITHERY) {
   const transport = new StdioServerTransport();
   server.connect(transport);
 }

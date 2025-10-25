@@ -1,3 +1,6 @@
 runtime: typescript
+# target can be 'local' or 'remote'
+# local: users run the server on their machine
+# remote: server runs on Smithery's infrastructure
 target: local
 
