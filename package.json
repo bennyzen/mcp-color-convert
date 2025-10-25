@@ -1,6 +1,6 @@
 {
   "name": "mcp-color-convert",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Comprehensive color conversion, manipulation, analysis, and accessibility MCP server",
   "keywords": [
     "color",
