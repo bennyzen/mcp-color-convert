@@ -81,6 +81,9 @@ dist/
 # TypeScript build output
 dist/
 
+# Smithery build output
+.smithery/
+
 # Gatsby files
 .cache/
 public

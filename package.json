@@ -45,10 +45,7 @@
   },
   "scripts": {
     "start": "node dist/index.js",
-    "build": "tsc && npx smithery build",
-    "build:tsc": "tsc",
-    "build:smithery": "npx smithery build",
-    "dev": "npx smithery dev",
+    "build": "tsc",
     "prepublishOnly": "npm run build"
   },
   "dependencies": {
@@ -57,7 +54,6 @@
     "zod": "^3.23.8"
   },
   "devDependencies": {
-    "@smithery/cli": "^1.6.3",
     "typescript": "^5.6.3"
   }
 }

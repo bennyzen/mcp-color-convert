@@ -2,8 +2,6 @@
 
 A comprehensive Model Context Protocol (MCP) server for color conversion, manipulation, analysis, and accessibility, designed for AI coding agents and assistants. This server provides a complete color toolkit for design systems, web development, and accessibility compliance using the `colorizr` library.
 
-[![smithery badge](https://smithery.ai/badge/@bennyzen/mcp-color-convert)](https://smithery.ai/server/@bennyzen/mcp-color-convert)
-
 ## Use Cases for AI Agents
 
 - **UI/UX Design**: Convert design system colors between formats for different platforms
@@ -236,28 +234,7 @@ npx -y mcp-color-convert@latest
 
 **Build process:**
 - TypeScript compiles to `dist/` directory
-- Smithery builds for deployment to `.smithery/` directory
 - Only `dist/`, `src/`, `README.md`, and `LICENSE` are included in the NPM package
-
-### Smithery Deployment
-
-This server is compatible with [Smithery](https://smithery.ai) for both local and remote deployment:
-
-**Local Deployment (current configuration):**
-- Server runs on the user's machine
-- Users install via NPM or NPX
-- Configuration in `smithery.yaml`: `target: local`
-
-**Remote Deployment:**
-- Server runs on Smithery's infrastructure
-- Change `smithery.yaml`: `target: remote`
-- Connect your GitHub repository to Smithery
-- Deploy from the Deployments tab on your server page
-
-**Smithery features:**
-- Automatic discovery by MCP clients
-- Session configuration forms (via `configSchema` export)
-- One-click installation for users
 
 ## Development
 

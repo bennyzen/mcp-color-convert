@@ -496,14 +496,7 @@ server.registerTool(
 
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 
-// Smithery requires default export function
-export default function createServer({ config }: { config?: any }) {
-  return server.server;
-}
-
-// Auto-connect when run as a standalone server (not when imported by Smithery)
+// Auto-connect when run as a standalone server
 // This handles: node dist/index.js, npx mcp-color-convert, and MCP clients
-if (!process.env.SMITHERY) {
-  const transport = new StdioServerTransport();
-  server.connect(transport);
-}
+const transport = new StdioServerTransport();
+server.connect(transport);
