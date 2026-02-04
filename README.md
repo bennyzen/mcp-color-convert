@@ -105,10 +105,11 @@ All major color formats support alpha values (0-1 scale):
 
 ### Color Manipulation
 - **`lighten`** - Increase color lightness by percentage amount
-- **`darken`** - Decrease color lightness by percentage amount  
+- **`darken`** - Decrease color lightness by percentage amount
 - **`saturate`** - Increase color saturation/intensity by percentage amount
 - **`desaturate`** - Decrease color saturation/intensity by percentage amount
-- **`invert`** - Create exact opposite/complementary color
+- **`invert`** - Create exact opposite/complementary color (180° hue rotation)
+- **`grayscale`** - Convert color to grayscale using perceptual OkLCH
 - **`rotate`** - Rotate hue by degrees around color wheel
 
 ### Color Analysis

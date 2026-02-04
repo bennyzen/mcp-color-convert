@@ -2,7 +2,7 @@
 
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { McpError } from "@modelcontextprotocol/sdk/types.js";
-import { 
+import {
   convert,
   lighten,
   darken,
@@ -15,14 +15,20 @@ import {
   name,
   palette,
   scheme,
-  swatch,
+  scale,
   random,
   contrast,
   compare,
-  textColor,
-  isValidColor
+  readableColor,
+  isValidColor,
+  grayscale,
+  invert
 } from "colorizr";
 import { z } from "zod";
+
+// Type definitions for better type safety
+type ColorFormat = 'hex' | 'rgb' | 'hsl' | 'oklch' | 'oklab';
+type SchemeType = 'complementary' | 'triadic' | 'tetradic' | 'analogous' | 'split-complementary' | 'square';
 
 // Optional: Configuration schema for session
 export const configSchema = z.object({
@@ -35,7 +41,7 @@ export const configSchema = z.object({
 
 const server = new McpServer({
   name: "color-converter",
-  version: "0.0.1",
+  version: "0.1.3",
   description: "Comprehensive color toolkit for conversion, manipulation, analysis, generation, and accessibility testing.",
 });
 
@@ -46,13 +52,12 @@ server.registerTool(
     description: "Converts a color from one format to another. Supports all major color formats including hex, rgb, rgba, hsl, hsla, oklch, oklab with full alpha/transparency support. Input can be any valid color string (hex, rgb, rgba, hsl, hsla, oklch, oklab, or named colors like 'red', 'blue'). Alpha values are preserved when converting between alpha-supporting formats, removed when converting to non-alpha formats. Available output formats: 'hex' (#FF0000), 'rgb' (rgb(255,0,0)), 'hsl' (hsl(0,100%,50%)), 'oklch' (oklch(63.3% 0.254 19.9)), 'oklab' (oklab(0.633 0.025 0.013)). Example: convert color '#FF0000' to format 'oklch'.",
     inputSchema: {
       color: z.string().describe("The color string to convert - accepts hex (#FF0000), rgb(255,0,0), rgba(255,0,0,0.5), hsl(0,100%,50%), hsla(0,100%,50%,0.5), oklch(63.3% 0.254 19.9), oklch(63.3% 0.254 19.9 / 0.5), oklab(0.633 0.025 0.013), oklab(0.633 0.025 0.013 / 0.5), or named colors ('red', 'blue', 'green'). Alpha values supported in all applicable formats."),
-      format: z.string().describe("The target color format: 'hex', 'rgb', 'hsl', 'oklch', or 'oklab'."),
+      format: z.enum(['hex', 'rgb', 'hsl', 'oklch', 'oklab']).describe("The target color format: 'hex', 'rgb', 'hsl', 'oklch', or 'oklab'."),
     },
   },
-  async (args) => {
-    const { color, format } = args;
+  async ({ color, format }) => {
     try {
-      const convertedColor = convert(color, format as any);
+      const convertedColor = convert(color, format);
       return {
         content: [{ type: "text", text: JSON.stringify({ color: convertedColor }) }],
       };
@@ -72,7 +77,7 @@ server.registerTool(
     description: "Increases the lightness of a color by a specified percentage amount. Perfect for creating lighter variations of colors for hover states, highlights, or design system variations.",
     inputSchema: {
       color: z.string().describe("The color string to lighten (e.g., '#FF0000', 'rgb(255,0,0)', 'rgba(255,0,0,0.5)', 'hsl(0,100%,50%)', 'hsla(0,100%,50%,0.5)', 'oklch(63.3% 0.254 19.9 / 0.5)', 'oklab(0.633 0.025 0.013 / 0.5)'). Supports all formats including alpha variants."),
-      amount: z.number().describe("The amount to increase lightness by (0-100). For example, 10 makes the color 10% lighter."),
+      amount: z.number().min(0).max(100).describe("The amount to increase lightness by (0-100). For example, 10 makes the color 10% lighter."),
     },
   },
   async ({ color, amount }) => {
@@ -94,7 +99,7 @@ server.registerTool(
     description: "Decreases the lightness of a color by a specified percentage amount. Ideal for creating darker variations for active states, shadows, or depth in design systems.",
     inputSchema: {
       color: z.string().describe("The color string to darken (e.g., '#FF0000', 'rgb(255,0,0)', 'rgba(255,0,0,0.5)', 'hsl(0,100%,50%)', 'hsla(0,100%,50%,0.5)', 'oklch(63.3% 0.254 19.9 / 0.5)', 'oklab(0.633 0.025 0.013 / 0.5)'). Supports all formats including alpha variants."),
-      amount: z.number().describe("The amount to decrease lightness by (0-100). For example, 10 makes the color 10% darker."),
+      amount: z.number().min(0).max(100).describe("The amount to decrease lightness by (0-100). For example, 10 makes the color 10% darker."),
     },
   },
   async ({ color, amount }) => {
@@ -116,7 +121,7 @@ server.registerTool(
     description: "Increases the saturation (intensity/vibrancy) of a color by a specified percentage amount. Use this to make colors more vivid and eye-catching.",
     inputSchema: {
       color: z.string().describe("The color string to saturate (e.g., '#FF0000', 'rgb(255,0,0)', 'rgba(255,0,0,0.5)', 'hsl(0,100%,50%)', 'hsla(0,100%,50%,0.5)', 'oklch(63.3% 0.254 19.9 / 0.5)', 'oklab(0.633 0.025 0.013 / 0.5)'). Supports all formats including alpha variants."),
-      amount: z.number().describe("The amount to increase saturation by (0-100). For example, 20 makes the color 20% more saturated."),
+      amount: z.number().min(0).max(100).describe("The amount to increase saturation by (0-100). For example, 20 makes the color 20% more saturated."),
     },
   },
   async ({ color, amount }) => {
@@ -138,7 +143,7 @@ server.registerTool(
     description: "Decreases the saturation (intensity/vibrancy) of a color by a specified percentage amount. Perfect for creating muted tones, subtle backgrounds, or less prominent UI elements.",
     inputSchema: {
       color: z.string().describe("The color string to desaturate (e.g., '#FF0000', 'rgb(255,0,0)', 'rgba(255,0,0,0.5)', 'hsl(0,100%,50%)', 'hsla(0,100%,50%,0.5)', 'oklch(63.3% 0.254 19.9 / 0.5)', 'oklab(0.633 0.025 0.013 / 0.5)'). Supports all formats including alpha variants."),
-      amount: z.number().describe("The amount to decrease saturation by (0-100). For example, 20 makes the color 20% less saturated."),
+      amount: z.number().min(0).max(100).describe("The amount to decrease saturation by (0-100). For example, 20 makes the color 20% less saturated."),
     },
   },
   async ({ color, amount }) => {
@@ -162,7 +167,7 @@ server.registerTool(
     description: "Rotates the hue of a color by specified degrees around the color wheel. Perfect for creating color harmonies, analogous colors, or systematic color variations.",
     inputSchema: {
       color: z.string().describe("The color string to rotate (e.g., '#FF0000', 'rgb(255,0,0)', 'rgba(255,0,0,0.5)', 'hsl(0,100%,50%)', 'hsla(0,100%,50%,0.5)', 'oklch(63.3% 0.254 19.9 / 0.5)', 'oklab(0.633 0.025 0.013 / 0.5)'). Supports all formats including alpha variants."),
-      degrees: z.number().describe("The number of degrees to rotate the hue (0-360). Positive values rotate clockwise, negative counter-clockwise. For example, 180 creates the complementary color."),
+      degrees: z.number().min(-360).max(360).describe("The number of degrees to rotate the hue (-360 to 360). Positive values rotate clockwise, negative counter-clockwise. For example, 180 creates the complementary color."),
     },
   },
   async ({ color, degrees }) => {
@@ -173,6 +178,48 @@ server.registerTool(
       };
     } catch (error) {
       throw new McpError(-32000, `Invalid color or degrees: ${(error as Error).message}`);
+    }
+  }
+);
+
+server.registerTool(
+  "invert",
+  {
+    title: "Invert Color",
+    description: "Inverts a color by rotating its hue 180 degrees (creates the complementary color). Perfect for finding opposite colors on the color wheel.",
+    inputSchema: {
+      color: z.string().describe("The color string to invert (e.g., '#FF0000', 'rgb(255,0,0)', 'rgba(255,0,0,0.5)', 'hsl(0,100%,50%)', 'hsla(0,100%,50%,0.5)', 'oklch(63.3% 0.254 19.9 / 0.5)', 'oklab(0.633 0.025 0.013 / 0.5)'). Supports all formats including alpha variants."),
+    },
+  },
+  async ({ color }) => {
+    try {
+      const result = rotate(color, 180);
+      return {
+        content: [{ type: "text", text: JSON.stringify({ inverted: result }) }],
+      };
+    } catch (error) {
+      throw new McpError(-32000, `Invalid color: ${(error as Error).message}`);
+    }
+  }
+);
+
+server.registerTool(
+  "grayscale",
+  {
+    title: "Convert to Grayscale",
+    description: "Converts a color to grayscale using OkLCH (perceptually uniform). Perfect for creating muted variants or checking luminance.",
+    inputSchema: {
+      color: z.string().describe("The color string to convert (e.g., '#FF0000', 'rgb(255,0,0)', 'rgba(255,0,0,0.5)', 'hsl(0,100%,50%)', 'hsla(0,100%,50%,0.5)', 'oklch(63.3% 0.254 19.9 / 0.5)', 'oklab(0.633 0.025 0.013 / 0.5)'). Supports all formats including alpha variants."),
+    },
+  },
+  async ({ color }) => {
+    try {
+      const result = grayscale(color);
+      return {
+        content: [{ type: "text", text: JSON.stringify({ grayscale: result }) }],
+      };
+    } catch (error) {
+      throw new McpError(-32000, `Invalid color: ${(error as Error).message}`);
     }
   }
 );
@@ -270,12 +317,12 @@ server.registerTool(
     description: "Generates a harmonious color palette from a base color. Creates 6 evenly spaced colors around the color wheel. Perfect for creating color schemes, themes, or design system foundations.",
     inputSchema: {
       color: z.string().describe("The base color to generate palette from (e.g., '#FF0000', 'rgb(255,0,0)', 'rgba(255,0,0,0.5)', 'hsl(0,100%,50%)', 'hsla(0,100%,50%,0.5)', 'oklch(63.3% 0.254 19.9 / 0.5)', 'oklab(0.633 0.025 0.013 / 0.5)'). Supports all formats including alpha variants."),
-      type: z.string().optional().describe("Optional palette type: 'default' (rainbow-style) or 'monochromatic' (same hue, varying lightness). Defaults to 'default'."),
+      monochromatic: z.boolean().optional().describe("If true, generates a monochromatic palette (same hue, varying lightness). If false or omitted, generates a rainbow-style palette."),
     },
   },
-  async ({ color, type }) => {
+  async ({ color, monochromatic }) => {
     try {
-      const options = type ? { type } as any : {};
+      const options = monochromatic ? { type: 'monochromatic' as const } : {};
       const result = palette(color, options);
       return {
         content: [{ type: "text", text: JSON.stringify({ palette: result }) }],
@@ -293,12 +340,12 @@ server.registerTool(
     description: "Generates specific color harmonies from a base color. Supports complementary, triadic, tetradic, and other classic color theory relationships. Essential for creating balanced, professional color combinations.",
     inputSchema: {
       color: z.string().describe("The base color to generate scheme from (e.g., '#FF0000', 'rgb(255,0,0)', 'rgba(255,0,0,0.5)', 'hsl(0,100%,50%)', 'hsla(0,100%,50%,0.5)', 'oklch(63.3% 0.254 19.9 / 0.5)', 'oklab(0.633 0.025 0.013 / 0.5)'). Supports all formats including alpha variants."),
-      type: z.string().describe("Scheme type: 'complementary' (2 colors), 'triadic' (3 colors), 'tetradic' (4 colors), 'analogous' (adjacent colors), or 'split-complementary'."),
+      type: z.enum(['complementary', 'triadic', 'tetradic', 'analogous', 'split-complementary', 'square']).describe("Scheme type: 'complementary' (2 colors), 'triadic' (3 colors), 'tetradic' (4 colors), 'analogous' (adjacent colors), 'split-complementary', or 'square' (4 colors)."),
     },
   },
   async ({ color, type }) => {
     try {
-      const result = scheme(color, type as any);
+      const result = scheme(color, type);
       return {
         content: [{ type: "text", text: JSON.stringify({ scheme: result }) }],
       };
@@ -315,19 +362,19 @@ server.registerTool(
     description: "Creates a complete 11-shade swatch from a base color (50, 100, 200...950). This is the industry standard for design systems like Tailwind CSS. Perfect for creating consistent light-to-dark variations.",
     inputSchema: {
       color: z.string().describe("The base color to generate swatch from (e.g., '#FF0000', 'rgb(255,0,0)', 'rgba(255,0,0,0.5)', 'hsl(0,100%,50%)', 'hsla(0,100%,50%,0.5)', 'oklch(63.3% 0.254 19.9 / 0.5)', 'oklab(0.633 0.025 0.013 / 0.5)'). Supports all formats including alpha variants."),
-      lightnessFactor: z.number().optional().describe("Optional multiplier for lightness adjustments (default: 1.0). Higher values create more contrast between shades."),
-      maxLightness: z.number().optional().describe("Optional maximum lightness cap (0-1, default: 0.95). Prevents shades from becoming too light."),
-      minLightness: z.number().optional().describe("Optional minimum lightness floor (0-1, default: 0.05). Prevents shades from becoming too dark."),
+      lightnessFactor: z.number().min(0).optional().describe("Optional multiplier for lightness adjustments (default: 1.0). Higher values create more contrast between shades."),
+      maxLightness: z.number().min(0).max(1).optional().describe("Optional maximum lightness cap (0-1, default: 0.95). Prevents shades from becoming too light."),
+      minLightness: z.number().min(0).max(1).optional().describe("Optional minimum lightness floor (0-1, default: 0.05). Prevents shades from becoming too dark."),
     },
   },
   async ({ color, lightnessFactor, maxLightness, minLightness }) => {
     try {
-      const options: any = {};
+      const options: Record<string, number> = {};
       if (lightnessFactor !== undefined) options.lightnessFactor = lightnessFactor;
       if (maxLightness !== undefined) options.maxLightness = maxLightness;
       if (minLightness !== undefined) options.minLightness = minLightness;
-      
-      const result = swatch(color, options);
+
+      const result = scale(color, options);
       return {
         content: [{ type: "text", text: JSON.stringify({ swatch: result }) }],
       };
@@ -343,12 +390,13 @@ server.registerTool(
     title: "Generate Random Color",
     description: "Generates a random color in the specified format. Useful for testing, prototyping, or when you need inspiration for new color choices.",
     inputSchema: {
-      format: z.string().optional().describe("Optional format for the random color: 'hex', 'rgb', 'hsl', 'oklch', 'oklab'. Defaults to 'hex'."),
+      format: z.enum(['hex', 'rgb', 'hsl', 'oklch', 'oklab']).optional().describe("Optional format for the random color: 'hex', 'rgb', 'hsl', 'oklch', 'oklab'. Defaults to 'hex'."),
     },
   },
   async ({ format }) => {
     try {
-      const result = random((format || 'hex') as any);
+      const options = format ? { format } as const : {};
+      const result = random(options);
       return {
         content: [{ type: "text", text: JSON.stringify({ random: result }) }],
       };
@@ -414,7 +462,7 @@ server.registerTool(
   },
   async ({ background }) => {
     try {
-      const result = textColor(background);
+      const result = readableColor(background);
       return {
         content: [{ type: "text", text: JSON.stringify({ textColor: result }) }],
       };
